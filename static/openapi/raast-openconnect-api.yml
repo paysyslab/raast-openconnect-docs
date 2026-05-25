@@ -6,11 +6,11 @@ info:
     Consolidated OpenAPI specification for **RAAST OpenConnect** integration APIs by Paysys Labs.
 
     Covers all five modules:
-    - **Bulk Sending** (v1.10) — High-volume batch payments
-    - **P2P** (v3.5) — Instant person-to-person transfers via CAS
-    - **P2M** (v1.8.2) — Merchant QRC and RTP payments
-    - **PISP** (v1.9) — Consent-based payment initiation
-    - **Remittance** (v1.5) — Inbound international remittance
+    - **Bulk Sending** — High-volume batch payments
+    - **P2P** — Instant person-to-person transfers via CAS
+    - **P2M** — Merchant QRC and RTP payments
+    - **PISP** — Consent-based payment initiation
+    - **Remittance** — Inbound international remittance
 
     **TSD References:** IS-ITS-0821-04, IS-ITS-1021-01, IS-ITS-1221-02, IS-ITS-1222-04, IS-ITS-0621-03
 
