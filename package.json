@@ -25,7 +25,8 @@
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.7.0",
-    "@docusaurus/types": "3.7.0"
+    "@docusaurus/types": "3.7.0",
+    "msw": "^2.14.6"
   },
   "engines": {
     "node": ">=18.0"
@@ -40,6 +41,11 @@
       "last 3 chrome version",
       "last 3 firefox version",
       "last 5 safari version"
+    ]
+  },
+  "msw": {
+    "workerDirectory": [
+      "static"
     ]
   }
 }
