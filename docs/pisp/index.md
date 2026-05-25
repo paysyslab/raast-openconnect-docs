@@ -5,7 +5,7 @@ sidebar_label: Overview
 sidebar_position: 1
 ---
 
-# PISP — Payment Initiation Service Provider <span className="version-badge">v1.9</span>
+# PISP — Payment Initiation Service Provider
 
 > **TSD Reference:** PSL Ref. IS-ITS-1222-04 | Version 1.9 | Last Modified: 10th March 2026
 

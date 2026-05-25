@@ -9,7 +9,6 @@ const modules = [
   {
     icon: '📦',
     title: 'Bulk Sending',
-    version: 'v1.10',
     desc: 'High-volume batch payroll, salary, pension & corporate disbursements via RAAST.',
     to: '/bulk-sending/',
     color: '#3a7bd5',
@@ -17,7 +16,6 @@ const modules = [
   {
     icon: '↔️',
     title: 'P2P Payments',
-    version: 'v3.5',
     desc: 'Instant person-to-person transfers via CAS aliases (CNIC, mobile, IBAN).',
     to: '/p2p/',
     color: '#7b68ee',
@@ -25,7 +23,6 @@ const modules = [
   {
     icon: '🏪',
     title: 'P2M / Merchant',
-    version: 'v1.8.2',
     desc: 'QR code (Static & Dynamic), RTP, and merchant-initiated payment flows.',
     to: '/p2m/',
     color: '#00bfff',
@@ -33,7 +30,6 @@ const modules = [
   {
     icon: '🔐',
     title: 'PISP',
-    version: 'v1.9',
     desc: 'Consent-based third-party payment initiation with full lifecycle management.',
     to: '/pisp/',
     color: '#ff6b9d',
@@ -41,7 +37,6 @@ const modules = [
   {
     icon: '🌍',
     title: 'Remittance',
-    version: 'v1.5',
     desc: 'Inbound international remittance via MTOs — FCY→PKR conversion to RAAST.',
     to: '/remittance/',
     color: '#00d4aa',
@@ -110,7 +105,6 @@ function ModulesSection() {
               <span className={styles.moduleIcon}>{m.icon}</span>
               <div className={styles.moduleTitle}>
                 {m.title}
-                <span className={styles.moduleVersion}>{m.version}</span>
               </div>
               <p className={styles.moduleDesc}>{m.desc}</p>
               <span className={styles.moduleArrow}>→</span>

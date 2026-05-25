@@ -5,7 +5,7 @@ sidebar_label: Overview
 sidebar_position: 1
 ---
 
-# Remittance <span className="version-badge">v1.5</span>
+# Remittance
 
 > **TSD Reference:** PSL Ref. IS-ITS-0621-03 | Version 1.5 | Last Modified: 29th April 2026
 

@@ -5,7 +5,7 @@ sidebar_label: Overview
 sidebar_position: 1
 ---
 
-# P2P — Person to Person <span className="version-badge">v3.5</span>
+# P2P — Person to Person
 
 > **TSD Reference:** PSL Ref. IS-ITS-0521-03 | Version 3.5 | Last Modified: 11th May 2026
 

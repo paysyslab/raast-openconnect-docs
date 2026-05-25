@@ -18,7 +18,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Bulk Sending (v1.10)',
+      label: 'Bulk Sending',
       link: { type: 'doc', id: 'bulk-sending/index' },
       items: [
         'bulk-sending/integration-interfaces',
@@ -32,7 +32,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'P2P (v3.5)',
+      label: 'P2P',
       link: { type: 'doc', id: 'p2p/index' },
       items: [
         'p2p/customer-registration',
@@ -48,7 +48,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'P2M – Merchant (v1.8.2)',
+      label: 'P2M – Merchant',
       link: { type: 'doc', id: 'p2m/index' },
       items: [
         'p2m/customer-initiated',
@@ -60,7 +60,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'PISP (v1.9)',
+      label: 'PISP',
       link: { type: 'doc', id: 'pisp/index' },
       items: [
         'pisp/oc-initiated',
@@ -69,7 +69,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Remittance (v1.5)',
+      label: 'Remittance',
       link: { type: 'doc', id: 'remittance/index' },
       items: [
         'remittance/inquiry-apis',

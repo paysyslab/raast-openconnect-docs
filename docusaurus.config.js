@@ -82,7 +82,7 @@ const config = {
       colorMode: {
         defaultMode: 'dark',
         disableSwitch: false,
-        respectPrefersColorScheme: true,
+        respectPrefersColorScheme: false,
       },
 
       navbar: {
@@ -100,11 +100,11 @@ const config = {
             label: 'Modules',
             position: 'left',
             items: [
-              { label: 'Bulk Sending (v1.10)', to: '/bulk-sending/' },
-              { label: 'P2P (v3.5)',           to: '/p2p/' },
-              { label: 'P2M (v1.8.2)',         to: '/p2m/' },
-              { label: 'PISP (v1.9)',           to: '/pisp/' },
-              { label: 'Remittance (v1.5)',     to: '/remittance/' },
+              { label: 'Bulk Sending', to: '/bulk-sending/' },
+              { label: 'P2P',         to: '/p2p/' },
+              { label: 'P2M',         to: '/p2m/' },
+              { label: 'PISP',        to: '/pisp/' },
+              { label: 'Remittance',  to: '/remittance/' },
             ],
           },
           {

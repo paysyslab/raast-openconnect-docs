@@ -5,7 +5,7 @@ sidebar_label: Overview
 sidebar_position: 1
 ---
 
-# P2M — Person to Merchant <span className="version-badge">v1.8.2</span>
+# P2M — Person to Merchant
 
 > **TSD Reference:** PSL Ref. IS-ITS-1222-03 | Version 1.8.2 | Last Modified: 26th Nov 2025
 

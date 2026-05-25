@@ -5,7 +5,7 @@ sidebar_label: Overview
 sidebar_position: 1
 ---
 
-# Bulk Sending <span className="version-badge">v1.10</span>
+# Bulk Sending
 
 > **TSD Reference:** PSL Ref. IS-ITS-0821-04 | Version 1.10 | Last Modified: 26th March 2026
 

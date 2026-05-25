@@ -54,31 +54,31 @@ OpenConnect is developed by **Paysys Labs (PSL)** and is deployed at participant
 
 This documentation covers the following RAAST + OpenConnect integration modules:
 
-### 1. [Bulk Sending (v1.10)](/bulk-sending/)
+### 1. [Bulk Sending](/bulk-sending/)
 High-volume batch payment disbursements — salaries, dividends, pensions, corporate payouts.
 - Pre-validation, Batch Payment, Return Payment, E2E Reconciliation
 - SWAPS integration (FBR tax payments)
 - Backoffice batch management
 
-### 2. [P2P — Person to Person (v3.5)](/p2p/)
+### 2. [P2P — Person to Person](/p2p/)
 Instant peer-to-peer fund transfers using IBAN or CAS aliases.
 - Customer registration, alias management, account management
 - Multiple payment API versions (v1 through v4)
 - FRMS (Fraud Risk Management) integration
 
-### 3. [P2M — Person to Merchant (v1.8.2)](/p2m/)
+### 3. [P2M — Person to Merchant](/p2m/)
 Customer and merchant-initiated merchant payments.
 - Static QRC, Dynamic QRC payments
 - Request to Pay (RTP) Now and Later flows
 - Onus payment APIs
 
-### 4. [PISP — Payment Initiation Service Provider (v1.9)](/pisp/)
+### 4. [PISP — Payment Initiation Service Provider](/pisp/)
 Consent-based payment initiation by third-party applications.
 - Consent issuance and revocation
 - OTP-based customer authentication
 - Consent lifecycle management
 
-### 5. [Remittance (v1.5)](/remittance/)
+### 5. [Remittance](/remittance/)
 International inbound remittance payments via RAAST.
 - FCY to PKR conversion support
 - Debit Customer Account and Direct Posting flows
@@ -120,27 +120,4 @@ All APIs return a standard response wrapper:
 
 ## Architecture Overview
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    Bank Digital Channels                  │
-│          (Mobile App / Internet Banking / ATM)            │
-└──────────────────────┬──────────────────────────────────┘
-                       │ REST APIs
-┌──────────────────────▼──────────────────────────────────┐
-│                    OpenConnect                            │
-│         (Participant-side Integration Middleware)         │
-│  ┌─────────────┐  ┌──────────────┐  ┌────────────────┐  │
-│  │ Bulk Sending│  │ P2P / P2M    │  │ PISP/Remittance│  │
-│  └──────┬──────┘  └──────┬───────┘  └───────┬────────┘  │
-└─────────┼────────────────┼──────────────────┼────────────┘
-          │                │ ISO 20022         │
-┌─────────▼────────────────▼──────────────────▼────────────┐
-│                  SBP RAAST (MPG)                          │
-│              National Instant Payment System              │
-└───────────────────────────────────────────────────────────┘
-          │
-┌─────────▼──────────────┐
-│   Bank Core Banking    │
-│   (CBS / Middleware)   │
-└────────────────────────┘
-```
+![OpenConnect System Architecture](/img/OC-system.png)
