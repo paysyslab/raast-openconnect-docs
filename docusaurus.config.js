@@ -7,9 +7,9 @@ const config = {
   tagline: 'Technical Specification Guides for RAAST Bulk Sending, P2P, P2M, PISP & Remittance via OpenConnect Middleware',
   favicon: 'img/favicon.png',
 
-  url: 'https://1912152.github.io',
+  url: 'https://paysyslab.github.io',
   baseUrl: '/raast-openconnect-docs/',
-  organizationName: '1912152',
+  organizationName: 'paysyslab',
   projectName: 'raast-openconnect-docs',
 
   onBrokenLinks: 'warn',
@@ -64,7 +64,7 @@ const config = {
         docs: {
           sidebarPath: './sidebars.js',
           routeBasePath: '/',
-          editUrl: 'https://github.com/1912152/raast-openconnect-docs/tree/main/',
+          editUrl: 'https://github.com/paysyslab/raast-openconnect-docs/tree/main/',
         },
         blog: false,
         theme: {
@@ -108,7 +108,7 @@ const config = {
             ],
           },
           {
-            href: 'https://github.com/1912152/raast-openconnect-docs',
+            href: 'https://github.com/paysyslab/raast-openconnect-docs',
             label: 'GitHub',
             position: 'right',
           },

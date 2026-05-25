@@ -22,7 +22,7 @@ info:
     url: https://paysyslabs.com
 
 servers:
-  - url: https://1912152.github.io/raast-openconnect-docs
+  - url: https://paysyslab.github.io/raast-openconnect-docs
     description: Mock Server (browser-intercepted — all APIs return live responses)
   - url: https://openconnect.bank.com
     description: Production (configure per bank)
