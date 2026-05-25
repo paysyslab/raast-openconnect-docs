@@ -1,0 +1,791 @@
+openapi: 3.0.3
+info:
+  title: OpenConnect — RAAST Integration API
+  version: 1.0.0
+  description: |
+    Consolidated OpenAPI specification for **RAAST OpenConnect** integration APIs by Paysys Labs.
+
+    Covers all five modules:
+    - **Bulk Sending** (v1.10) — High-volume batch payments
+    - **P2P** (v3.5) — Instant person-to-person transfers via CAS
+    - **P2M** (v1.8.2) — Merchant QRC and RTP payments
+    - **PISP** (v1.9) — Consent-based payment initiation
+    - **Remittance** (v1.5) — Inbound international remittance
+
+    **TSD References:** IS-ITS-0821-04, IS-ITS-1021-01, IS-ITS-1221-02, IS-ITS-1222-04, IS-ITS-0621-03
+
+  contact:
+    name: Paysys Labs Support
+    url: https://paysyslabs.com
+  license:
+    name: Proprietary
+    url: https://paysyslabs.com
+
+servers:
+  - url: https://openconnect.bank.com
+    description: Production (configure per bank)
+  - url: https://sandbox.paysyslabs.com/openconnect
+    description: Sandbox / UAT
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Authentication
+    description: Token-based authentication (V1 proprietary & V2 KeyCloak)
+  - name: Bulk Sending
+    description: High-volume batch corporate payments via RAAST
+  - name: P2P — Customer Registration
+    description: CAS customer and alias registration
+  - name: P2P — Payments
+    description: Instant person-to-person payments (v1–v4)
+  - name: P2P — Inquiry
+    description: Title fetch, alias lookup, institution list
+  - name: P2M — Customer Initiated
+    description: Static QRC, pay-to-alias, merchant alias inquiry
+  - name: P2M — Merchant Initiated
+    description: DQRC, RTPL, RTPN, RTP acceptance
+  - name: PISP — Channel Integration
+    description: Consent status, details, and revocation (Channel → OC)
+  - name: Remittance
+    description: International remittance payment APIs
+
+paths:
+  # ─── AUTHENTICATION ─────────────────────────────────────────────
+  /authenticate:
+    post:
+      tags: [Authentication]
+      summary: Get Access Token (V1)
+      operationId: authenticateV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password, channel]
+              properties:
+                username: { type: string, example: "test" }
+                password: { type: string, example: "test@1234" }
+                channel:  { type: string, example: "IB" }
+      responses:
+        '200':
+          description: JWT token returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:  { type: string, example: "eyJhbGci..." }
+                  expiry: { type: string, example: "1625912767" }
+        '401': { description: Invalid credentials }
+
+  /realms/paysys-raast-realm/protocol/openid-connect/token:
+    post:
+      tags: [Authentication]
+      summary: Get Access Token (V2 — KeyCloak)
+      operationId: authenticateV2
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [grant_type, client_id, client_secret]
+              properties:
+                grant_type:    { type: string, enum: [client_credentials] }
+                client_id:     { type: string, example: "bank-channel-ib" }
+                client_secret: { type: string, example: "••••••••" }
+      responses:
+        '200':
+          description: OAuth2 token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:       { type: string }
+                  expires_in:         { type: integer, example: 300 }
+                  refresh_expires_in: { type: integer, example: 0 }
+                  token_type:         { type: string, example: "Bearer" }
+
+  # ─── BULK SENDING ────────────────────────────────────────────────
+  /api/v1/paysyslabs/bulksending/preval:
+    post:
+      tags: [Bulk Sending]
+      summary: Batch Pre-Validation
+      operationId: bulkPreValidation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BulkPrevalRequest' }
+      responses:
+        '200': { description: Pre-validation accepted, content: { application/json: { schema: { $ref: '#/components/schemas/BulkBasicResponse' } } } }
+
+  /api/v1/paysyslabs/bulksending/payment:
+    post:
+      tags: [Bulk Sending]
+      summary: Batch Payment Request
+      operationId: bulkPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BulkPaymentRequest' }
+      responses:
+        '200': { description: Payment batch accepted, content: { application/json: { schema: { $ref: '#/components/schemas/BulkBasicResponse' } } } }
+
+  /api/v1/paysyslabs/bulksending/paymentinquiry:
+    post:
+      tags: [Bulk Sending]
+      summary: Transaction Inquiry
+      operationId: bulkPaymentInquiry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                batch_id:          { type: string, example: "BATCH20210526001" }
+                transaction_id:    { type: string, example: "TXN001" }
+                rrn:               { type: string, example: "000000123456" }
+                stan:              { type: string, example: "123456" }
+      responses:
+        '200': { description: Inquiry result, content: { application/json: { schema: { $ref: '#/components/schemas/BulkBasicResponse' } } } }
+
+  /api/v1/paysyslabs/bulksending/swaps/inquiry:
+    post:
+      tags: [Bulk Sending]
+      summary: SWAPS Tax Inquiry (FBR)
+      operationId: swapsInquiry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                challanNo:  { type: string, example: "CHN123456" }
+                psid:       { type: string, example: "PSID789012" }
+                rrn:        { type: string, example: "000000123456" }
+                stan:       { type: string, example: "123456" }
+      responses:
+        '200': { description: SWAPS inquiry result }
+
+  /api/v1/paysyslabs/bulksending/tax/payment:
+    post:
+      tags: [Bulk Sending]
+      summary: Tax Batch Payment (SWAPS/FBR)
+      operationId: taxBatchPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BulkPaymentRequest' }
+      responses:
+        '200': { description: Tax batch submitted }
+
+  # ─── P2P ─────────────────────────────────────────────────────────
+  /api/v1/paysyslabs/cas/onestepreg:
+    post:
+      tags: [P2P — Customer Registration]
+      summary: One-Step CAS Registration
+      operationId: casOneStepReg
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CasRegistrationRequest' }
+      responses:
+        '200': { description: Registration result, content: { application/json: { schema: { $ref: '#/components/schemas/CasBasicResponse' } } } }
+
+  /api/v1/paysyslabs/cas/customerreg:
+    post:
+      tags: [P2P — Customer Registration]
+      summary: Customer Registration
+      operationId: casCustomerReg
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CasRegistrationRequest' }
+      responses:
+        '200': { description: Customer registered }
+
+  /api/v1/paysyslabs/banklist:
+    get:
+      tags: [P2P — Inquiry]
+      summary: Get Institutions List
+      operationId: getInstitutionsList
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          schema: { type: string, example: "Bearer eyJhbGci..." }
+      responses:
+        '200':
+          description: List of RAAST participants
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ParticipantsResponse' }
+
+  /api/v1/paysyslabs/titlefetch:
+    post:
+      tags: [P2P — Inquiry]
+      summary: Title Fetch
+      operationId: titleFetch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [memberid, iban, amount, rrn, stan]
+              properties:
+                memberid: { type: string, example: "SONEPKKA", maxLength: 24 }
+                iban:     { type: string, example: "PK13SONE0001201021813320", maxLength: 24 }
+                idType:   { type: string, example: "CNIC", maxLength: 32 }
+                idValue:  { type: string, maxLength: 64 }
+                amount:   { type: number, example: 15420.20 }
+                rrn:      { type: string, example: "012365012365", maxLength: 12 }
+                stan:     { type: string, example: "012365", maxLength: 6 }
+      responses:
+        '200':
+          description: Account title returned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TitleFetchResponse' }
+
+  /api/v3/paysyslabs/payment:
+    post:
+      tags: [P2P — Payments]
+      summary: P2P Payment v3 (Async — Debit Account)
+      operationId: p2pPaymentV3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/P2PPaymentRequest' }
+      responses:
+        '200': { description: Payment initiated, content: { application/json: { schema: { $ref: '#/components/schemas/PaymentResponse' } } } }
+
+  /api/v3/paysyslabs/directposting:
+    post:
+      tags: [P2P — Payments]
+      summary: P2P Payment v3 (Async — Direct Posting)
+      operationId: p2pDirectPostingV3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/P2PPaymentRequest' }
+      responses:
+        '200': { description: Direct posting initiated, content: { application/json: { schema: { $ref: '#/components/schemas/PaymentResponse' } } } }
+
+  /api/v1/paysyslabs/creditinquiry:
+    get:
+      tags: [P2P — Inquiry]
+      summary: Payment Inquiry (Credit Status)
+      operationId: creditInquiry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                iban:             { type: string }
+                Original_STAN:    { type: string }
+                Original_RRN:     { type: string }
+                amount:           { type: string }
+                transaction_date: { type: string }
+                transaction_time: { type: string }
+                rrn:              { type: string }
+                stan:             { type: string }
+      responses:
+        '200': { description: Inquiry result }
+
+  # ─── P2M ─────────────────────────────────────────────────────────
+  /api/v1/paysyslabs/p2m/sqrc/payment:
+    post:
+      tags: [P2M — Customer Initiated]
+      summary: Static QRC Payment
+      operationId: p2mSQRCPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/P2MPaymentRequest' }
+      responses:
+        '200': { description: QRC payment initiated, content: { application/json: { schema: { $ref: '#/components/schemas/PaymentResponse' } } } }
+
+  /api/v1/paysyslabs/p2m/dqrc/payment:
+    post:
+      tags: [P2M — Merchant Initiated]
+      summary: Dynamic QRC (DQRC) Payment
+      operationId: p2mDQRCPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/P2MPaymentRequest' }
+      responses:
+        '200': { description: DQRC payment initiated }
+
+  /api/v1/paysyslabs/p2m/rtpl:
+    post:
+      tags: [P2M — Merchant Initiated]
+      summary: Request to Pay — Linked (RTPL)
+      operationId: p2mRTPL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RTPRequest' }
+      responses:
+        '200': { description: RTP Linked sent }
+
+  /api/v1/paysyslabs/p2m/rtpn:
+    post:
+      tags: [P2M — Merchant Initiated]
+      summary: Request to Pay — Non-Linked (RTPN)
+      operationId: p2mRTPN
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RTPRequest' }
+      responses:
+        '200': { description: RTP Non-Linked sent }
+
+  /api/v1/paysyslabs/p2m/rtp/acceptance:
+    post:
+      tags: [P2M — Merchant Initiated]
+      summary: RTP Acceptance (Approve / Reject)
+      operationId: p2mRTPAcceptance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rrn:            { type: string }
+                stan:           { type: string }
+                originalRrn:    { type: string }
+                originalStan:   { type: string }
+                status:         { type: string, enum: [ACCEPTED, REJECTED] }
+                rejectCode:     { type: string }
+                rejectReason:   { type: string }
+      responses:
+        '200': { description: Acceptance recorded }
+
+  # ─── PISP ────────────────────────────────────────────────────────
+  /api/v1/paysyslabs/pisp/consent/status:
+    post:
+      tags: [PISP — Channel Integration]
+      summary: Customer Consent Notification Status
+      operationId: pispConsentStatus
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status, consentId, accounts, senderParticipantCode, info]
+              properties:
+                status:                { type: string, example: "00", description: "00=Approved, 01=Rejected" }
+                consentId:             { type: string, example: "d01b5fd6-8276-4f88-b672-cb1040245caa" }
+                accounts:              { type: array, items: { type: string }, example: ["PKABPKA80299910920312"] }
+                senderParticipantCode: { type: string, example: "HABLPKKA" }
+                info:
+                  type: object
+                  properties:
+                    rrn:  { type: string, example: "112233445566" }
+                    stan: { type: string, example: "010123" }
+      responses:
+        '200':
+          description: Status acknowledged
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  responseCode: { type: string, example: "00" }
+                  responseDesc: { type: string, example: "SUCCESS" }
+
+  /api/v1/paysyslabs/pisp/consentDetails:
+    post:
+      tags: [PISP — Channel Integration]
+      summary: Get Consent Authorization Details (Pull Flow)
+      operationId: pispConsentDetails
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [idType, idValue, info]
+              properties:
+                idType:  { type: string, example: "mobile" }
+                idValue: { type: string, example: "03001234567" }
+                info:
+                  type: object
+                  properties:
+                    rrn:  { type: string }
+                    stan: { type: string }
+      responses:
+        '200':
+          description: Consent details returned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConsentDetailsResponse' }
+
+  /api/v1/paysyslabs/pisp/consentRevoked:
+    post:
+      tags: [PISP — Channel Integration]
+      summary: Customer Consent Revocation
+      operationId: pispConsentRevoke
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [consentId, senderParticipantCode, info]
+              properties:
+                consentId:             { type: string }
+                senderParticipantCode: { type: string }
+                info:
+                  type: object
+                  properties:
+                    rrn:  { type: string }
+                    stan: { type: string }
+      responses:
+        '200': { description: Consent revoked }
+
+  # ─── REMITTANCE ──────────────────────────────────────────────────
+  /api/v3/paysyslabs/remittance/payment:
+    post:
+      tags: [Remittance]
+      summary: Remittance Payment (Debit Customer Account)
+      operationId: remittancePaymentDebit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RemittancePaymentRequest' }
+      responses:
+        '200': { description: Remittance initiated, content: { application/json: { schema: { $ref: '#/components/schemas/PaymentResponse' } } } }
+
+  /api/v3/paysyslabs/remittance/directposting:
+    post:
+      tags: [Remittance]
+      summary: Remittance Payment (Direct Posting)
+      operationId: remittanceDirectPosting
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RemittancePaymentRequest' }
+      responses:
+        '200': { description: Direct remittance posting initiated, content: { application/json: { schema: { $ref: '#/components/schemas/PaymentResponse' } } } }
+
+  /api/v1/paysyslabs/creditinquiryv3:
+    get:
+      tags: [Remittance]
+      summary: Payment Inquiry V3 (with correlation IDs)
+      operationId: creditInquiryV3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                iban:             { type: string }
+                Original_STAN:    { type: string }
+                Original_RRN:     { type: string }
+                amount:           { type: number }
+                transaction_date: { type: string }
+                transaction_time: { type: string }
+                rrn:              { type: string }
+                stan:             { type: string }
+      responses:
+        '200':
+          description: Inquiry result with correlation IDs
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      correlationId:  { type: string }
+                      messageId:      { type: string }
+                      instructionId:  { type: string }
+                      transactionId:  { type: string }
+
+# ─── COMPONENTS ──────────────────────────────────────────────────────
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    BasicResponse:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            response_code: { type: string, example: "00" }
+            response_desc: { type: string, example: "SUCCESS" }
+        rrn:  { type: string, example: "010123010123" }
+        stan: { type: string, example: "010123" }
+
+    PaymentResponse:
+      allOf:
+        - $ref: '#/components/schemas/BasicResponse'
+        - type: object
+          properties:
+            correlationId: { type: string, example: "axxansayyysaii965sa2asasannsas" }
+            messageId:     { type: string, example: "JJHHK1222333665" }
+            instructionId: { type: string, example: "JJHHK1222333665" }
+            transactionId: { type: string, example: "JJHHK1222333665" }
+
+    CasBasicResponse:
+      type: object
+      properties:
+        responseCode: { type: string, example: "00" }
+        responseDesc: { type: string, example: "SUCCESS" }
+        rrn:          { type: string }
+        stan:         { type: string }
+
+    BulkBasicResponse:
+      type: object
+      properties:
+        response_code: { type: string, example: "00" }
+        response_desc: { type: string, example: "SUCCESS" }
+        batch_id:      { type: string, example: "BATCH20210526001" }
+        rrn:           { type: string }
+        stan:          { type: string }
+
+    ParticipantsResponse:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            response_code: { type: string }
+            response_desc: { type: string }
+            participants:
+              type: array
+              items:
+                type: object
+                properties:
+                  bic:              { type: string, example: "ABPAPKKA" }
+                  participant_name: { type: string, example: "Allied Bank Limited" }
+        rrn:  { type: string }
+        stan: { type: string }
+
+    TitleFetchResponse:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            response_code: { type: string }
+            response_desc: { type: string }
+            account-information:
+              type: object
+              properties:
+                acctitle: { type: string, example: "Waqas Nizam" }
+                acctype:  { type: string, example: "Account" }
+            fee: { type: number, example: 0 }
+        stan: { type: string }
+        rrn:  { type: string }
+
+    ConsentDetailsResponse:
+      type: object
+      properties:
+        responseCode: { type: string, example: "00" }
+        responseDesc: { type: string, example: "SUCCESS" }
+        accounts:
+          type: array
+          items:
+            type: object
+            properties:
+              account:               { type: string, example: "PKABPKA80299910920312" }
+              consentId:             { type: string }
+              scopes:                { type: array, items: { type: string } }
+              accountTitle:          { type: string }
+              status:                { type: string, enum: [APPROVED, ISSUED, REJECTED, REVOKED] }
+              senderParticipantCode: { type: string }
+              issuedDateTime:        { type: string }
+              approvedDateTime:      { type: string }
+        receiverParticipantCode: { type: string }
+
+    BulkPrevalRequest:
+      type: object
+      required: [batch_id, debit_account, transactions, rrn, stan]
+      properties:
+        batch_id:       { type: string, example: "BATCH20210526001" }
+        debit_account:  { type: string, example: "PK56AIIN1234567890000001" }
+        channel:        { type: string, example: "IB" }
+        rrn:            { type: string, example: "000000123456" }
+        stan:           { type: string, example: "123456" }
+        transactions:
+          type: array
+          items:
+            type: object
+            properties:
+              transaction_id:            { type: string }
+              receiver_iban:             { type: string }
+              receiver_name:             { type: string }
+              receiver_participant_code: { type: string }
+              amount:                    { type: number }
+              payment_purpose:           { type: string }
+              narration:                 { type: string }
+
+    BulkPaymentRequest:
+      type: object
+      required: [batch_id, debit_account, transactions, rrn, stan]
+      properties:
+        batch_id:      { type: string, example: "BATCH20210526001" }
+        debit_account: { type: string, example: "PK56AIIN1234567890000001" }
+        channel:       { type: string, example: "IB" }
+        rrn:           { type: string, example: "000000123456" }
+        stan:          { type: string, example: "123456" }
+        transactions:
+          type: array
+          items:
+            type: object
+            properties:
+              transaction_id:            { type: string }
+              receiver_iban:             { type: string }
+              receiver_name:             { type: string }
+              receiver_participant_code: { type: string }
+              amount:                    { type: number }
+              payment_purpose:           { type: string }
+              narration:                 { type: string }
+              fee:                       { type: number }
+
+    CasRegistrationRequest:
+      type: object
+      properties:
+        mpgid:
+          type: object
+          properties:
+            type:  { type: string, example: "CNIC" }
+            value: { type: string, example: "1234567890123" }
+        aliases:
+          type: array
+          items:
+            type: object
+            properties:
+              type:  { type: string, example: "MOBILE" }
+              value: { type: string, example: "03001234567" }
+        accounts:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: object
+                properties:
+                  iban: { type: string, example: "PK26AIIN1234567890000056" }
+              currency:  { type: string, example: "PKR" }
+              isDefault: { type: boolean }
+        rrn:  { type: string, example: "000000123456" }
+        stan: { type: string, example: "123456" }
+
+    P2PPaymentRequest:
+      type: object
+      required: [sender_iban, receiver_iban, receiver_name, receiver_participant_code, amount, payment_purpose, ttc, rrn, stan]
+      properties:
+        sender_iban:               { type: string, example: "PK56AIIN1234567890000001", maxLength: 24 }
+        sender_name:               { type: string, example: "Ghulam Ali", maxLength: 140 }
+        receiver_iban:             { type: string, example: "PK56AIIN1234567890000999", maxLength: 24 }
+        receiver_name:             { type: string, example: "Daniyal Shaikh", maxLength: 140 }
+        receiver_participant_code: { type: string, example: "BICS1201", maxLength: 12 }
+        amount:                    { type: number, example: 5000.00 }
+        fee:                       { type: number, example: 0 }
+        payment_purpose:           { type: string, example: "001", maxLength: 3 }
+        narration:                 { type: string, example: "Salary payment", maxLength: 35 }
+        ttc:                       { type: string, example: "001", maxLength: 3, description: "001 for P2P, 005 for Remittance" }
+        transaction_date:          { type: string, example: "2021-05-26" }
+        transaction_time:          { type: string, example: "122550" }
+        rrn:                       { type: string, example: "000000123456", maxLength: 12 }
+        stan:                      { type: string, example: "123456", maxLength: 6 }
+        reserve_field_1:           { type: string }
+        reserve_field_2:           { type: string }
+        reserve_field_3:           { type: string }
+        reserve_field_4:           { type: string }
+        reserve_field_5:           { type: string }
+
+    P2MPaymentRequest:
+      type: object
+      properties:
+        sender_iban:               { type: string, example: "PK56AIIN1234567890000001" }
+        sender_name:               { type: string }
+        merchant_iban:             { type: string, example: "PK56AIIN0000000000000999" }
+        merchant_id:               { type: string, example: "MID00123" }
+        merchant_name:             { type: string, example: "Gourmet Bakery" }
+        receiver_participant_code: { type: string, example: "BICS1201" }
+        amount:                    { type: number, example: 1500.00 }
+        payment_purpose:           { type: string, example: "022" }
+        categoryCode:              { type: string, example: "5411" }
+        ttc:                       { type: string, example: "001" }
+        rrn:                       { type: string, example: "000000123456" }
+        stan:                      { type: string, example: "123456" }
+
+    RTPRequest:
+      type: object
+      properties:
+        merchant_iban:             { type: string }
+        merchant_name:             { type: string }
+        receiver_participant_code: { type: string }
+        amount:                    { type: number }
+        payment_purpose:           { type: string }
+        categoryCode:              { type: string }
+        expiry:                    { type: string, example: "2021-05-26T12:00:00" }
+        rrn:                       { type: string }
+        stan:                      { type: string }
+
+    RemittancePaymentRequest:
+      type: object
+      required: [sender_iban, sender_idtype, sender_idvalue, sender_name, receiver_iban, receiver_name, receiver_participant_code, amount, payment_purpose, narration, ttc, rrn, stan]
+      properties:
+        sender_iban:               { type: string, example: "PK56AIIN1234567890000001", maxLength: 24 }
+        sender_idtype:             { type: string, example: "CNIC", maxLength: 32 }
+        sender_idvalue:            { type: string, example: "1234567890123", maxLength: 64 }
+        sender_name:               { type: string, example: "Ghulam Ali", maxLength: 140 }
+        receiver_iban:             { type: string, example: "PK56AIIN1234567890000999", maxLength: 24 }
+        receiver_idtype:           { type: string, maxLength: 32 }
+        receiver_idvalue:          { type: string, maxLength: 64 }
+        receiver_name:             { type: string, example: "Daniyal Shaikh", maxLength: 140 }
+        receiver_participant_code: { type: string, example: "BICS1201", maxLength: 12 }
+        remitting_institute:       { type: string, example: "WesternUnion", maxLength: 35 }
+        country:                   { type: string, example: "US", maxLength: 2 }
+        country_code:              { type: string, example: "2100", maxLength: 4 }
+        currency_FCY:              { type: string, example: "USD", maxLength: 3 }
+        amount_in_FCY:             { type: number, example: 20.00 }
+        amount:                    { type: number, example: 5600.00 }
+        rate_of_conversion:        { type: number, example: 280.78 }
+        payment_purpose:           { type: string, example: "001", maxLength: 3 }
+        transaction_reference:     { type: string, maxLength: 35 }
+        fee:                       { type: number, example: 0 }
+        transaction_date:          { type: string, example: "2021-05-26" }
+        transaction_time:          { type: string, example: "122550" }
+        narration:                 { type: string, example: "9471", maxLength: 35, description: "Remittance purpose code per SBP Code List No. 5" }
+        ttc:                       { type: string, example: "005", maxLength: 3, description: "005 for Remittance" }
+        rrn:                       { type: string, example: "000000123456", maxLength: 12 }
+        stan:                      { type: string, example: "123456", maxLength: 6 }
+        reserve_field_1:           { type: string }
+        reserve_field_2:           { type: string }
+        reserve_field_3:           { type: string }
+        reserve_field_4:           { type: string }
+        reserve_field_5:           { type: string }

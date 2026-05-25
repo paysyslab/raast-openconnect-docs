@@ -1,111 +1,142 @@
-/**
- * OpenConnect RAAST Docs – Custom CSS
- */
-
+/* ── Theme Tokens (Light) ───────────────────────────────────── */
 :root {
-  --ifm-color-primary: #2e8b57;
-  --ifm-color-primary-dark: #267a4d;
-  --ifm-color-primary-darker: #237348;
-  --ifm-color-primary-darkest: #1c5e3b;
-  --ifm-color-primary-light: #369c62;
-  --ifm-color-primary-lighter: #39a367;
-  --ifm-color-primary-lightest: #47b876;
+  --ifm-color-primary: #0ea5a4;
+  --ifm-color-primary-dark: #0b8b8a;
+  --ifm-color-primary-darker: #097f7e;
+  --ifm-color-primary-darkest: #076564;
+  --ifm-color-primary-light: #12b7b6;
+  --ifm-color-primary-lighter: #18c0bf;
+  --ifm-color-primary-lightest: #36d0cf;
 
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
-  --ifm-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --ifm-heading-font-weight: 700;
+  --ifm-font-family-base: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --ifm-heading-font-family: var(--ifm-font-family-base);
+  --ifm-font-size-base: 16px;
+  --ifm-line-height-base: 1.65;
+
+  --ifm-container-width: 1200px;
+  --ifm-global-radius: 12px;
+  --ifm-card-border-radius: 16px;
+  --ifm-navbar-height: 4.25rem;
+  --ifm-code-font-size: 92%;
+  --ifm-code-border-radius: 10px;
+
+  --oc-surface: #ffffff;
+  --oc-surface-2: #f6f8fb;
+  --oc-border: rgba(15, 23, 42, 0.12);
+  --oc-text: #0f172a;
+  --oc-text-muted: rgba(15, 23, 42, 0.72);
+
+  --docusaurus-highlighted-code-line-bg: rgba(14, 165, 164, 0.10);
 }
 
+/* ── Theme Tokens (Dark) ────────────────────────────────────── */
 [data-theme='dark'] {
-  --ifm-color-primary: #4ade80;
-  --ifm-color-primary-dark: #22c55e;
-  --ifm-color-primary-darker: #16a34a;
-  --ifm-color-primary-darkest: #15803d;
-  --ifm-color-primary-light: #86efac;
-  --ifm-color-primary-lighter: #bbf7d0;
-  --ifm-color-primary-lightest: #dcfce7;
+  --ifm-color-primary: #22d3ee;
+  --ifm-color-primary-dark: #1fbdd4;
+  --ifm-color-primary-darker: #1bb1c7;
+  --ifm-color-primary-darkest: #178ea2;
+  --ifm-color-primary-light: #36daf0;
+  --ifm-color-primary-lighter: #4be0f3;
+  --ifm-color-primary-lightest: #78e9f7;
 
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
-  --ifm-background-color: #0f1117;
-  --ifm-navbar-background-color: #0f1117;
-  --ifm-sidebar-background: #161b22;
+  --oc-surface: #0b1220;
+  --oc-surface-2: #0f172a;
+  --oc-border: rgba(148, 163, 184, 0.18);
+  --oc-text: #e5e7eb;
+  --oc-text-muted: rgba(229, 231, 235, 0.72);
+
+  --docusaurus-highlighted-code-line-bg: rgba(34, 211, 238, 0.14);
 }
 
-/* API endpoint badges */
+/* ── Base ───────────────────────────────────────────────────── */
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body { color: var(--oc-text); background: var(--oc-surface); }
+a { text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+/* ── Navbar ─────────────────────────────────────────────────── */
+.navbar {
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--oc-border);
+  background: rgba(255, 255, 255, 0.82);
+}
+[data-theme='dark'] .navbar { background: rgba(11, 18, 32, 0.78); }
+.navbar__logo img { height: 36px; width: auto; }
+.navbar__item.navbar__link { font-weight: 600; letter-spacing: 0.2px; }
+.navbar__item.navbar__link--active { color: var(--ifm-color-primary); }
+
+/* ── Buttons ────────────────────────────────────────────────── */
+.button { border-radius: 12px; font-weight: 700; }
+.button--primary { box-shadow: 0 10px 25px rgba(14,165,164,0.22); }
+.button--secondary { border: 1px solid var(--oc-border); }
+
+/* ── Cards ──────────────────────────────────────────────────── */
+.card {
+  border-radius: var(--ifm-card-border-radius);
+  border: 1px solid var(--oc-border);
+  background: var(--oc-surface-2);
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
+}
+[data-theme='dark'] .card { box-shadow: 0 12px 36px rgba(0,0,0,0.35); }
+
+/* ── Docs typography ────────────────────────────────────────── */
+.markdown { color: var(--oc-text); }
+.markdown p, .markdown li { color: var(--oc-text-muted); font-size: 1rem; line-height: 1.75; }
+.markdown h1, .markdown h2, .markdown h3, .markdown h4 { color: var(--oc-text); letter-spacing: -0.2px; }
+.markdown h1 { font-size: 1.9rem; }
+.markdown h2 { font-size: 1.4rem; margin-top: 2.2rem; padding-top: 0.25rem; border-top: 1px solid var(--oc-border); }
+.markdown hr { border-color: var(--oc-border); }
+
+/* ── Code blocks ────────────────────────────────────────────── */
+pre, code { border-radius: var(--ifm-code-border-radius); }
+.theme-code-block { border: 1px solid var(--oc-border); }
+code { border: 1px solid rgba(148,163,184,0.25); }
+
+/* ── Sidebar ────────────────────────────────────────────────── */
+.theme-doc-sidebar-container { border-right: 1px solid var(--oc-border); }
+.menu__link { border-radius: 10px; font-weight: 600; }
+.menu__link--active { background: rgba(14,165,164,0.10); color: var(--ifm-color-primary); }
+
+/* ── Footer ─────────────────────────────────────────────────── */
+.footer { border-top: 1px solid var(--oc-border); }
+.footer__title { font-weight: 800; }
+
+/* ── Misc polish ────────────────────────────────────────────── */
+.table-of-contents__link--active { color: var(--ifm-color-primary); }
+.pagination-nav__link { border-radius: 14px; border: 1px solid var(--oc-border); }
+
+/* ── HTTP method badges ─────────────────────────────────────── */
 .http-method {
   display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
   margin-right: 8px;
+  vertical-align: middle;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
+.method-get    { background: #1d4ed8; color: #fff; }
+.method-post   { background: #15803d; color: #fff; }
+.method-put    { background: #b45309; color: #fff; }
+.method-delete { background: #b91c1c; color: #fff; }
 
-.method-post { background: #2d6a4f; color: #d8f3dc; }
-.method-get  { background: #1a4a7a; color: #cce4ff; }
-.method-put  { background: #7a4a1a; color: #ffe0b3; }
-.method-delete { background: #7a1a1a; color: #ffd5d5; }
-
-/* Parameter tables */
-table {
-  display: table;
-  width: 100%;
-  font-size: 0.88rem;
-}
-
-table th {
-  background: var(--ifm-color-emphasis-200);
-  font-weight: 700;
-}
-
-[data-theme='dark'] table th {
-  background: #1e2530;
-}
-
-/* Code block improvements */
-.prism-code {
-  border-radius: 8px;
-}
-
-/* Admonition styling */
-.alert--info {
-  border-left: 4px solid var(--ifm-color-primary);
-}
-
-/* Navbar */
-.navbar {
-  box-shadow: 0 1px 0 0 var(--ifm-toc-border-color);
-}
-
-/* Sidebar category headers */
-.menu__list-item-collapsible .menu__link {
-  font-weight: 600;
-}
-
-/* Hero badge */
+/* ── Version badge ──────────────────────────────────────────── */
 .version-badge {
   display: inline-block;
-  padding: 2px 10px;
-  border-radius: 12px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  background: var(--ifm-color-primary);
-  color: var(--ifm-background-color);
-  margin-left: 8px;
+  background: rgba(34,211,238,0.15);
+  color: #22d3ee;
+  border: 1px solid rgba(34,211,238,0.4);
+  border-radius: 20px;
+  padding: 1px 10px;
+  margin-left: 10px;
   vertical-align: middle;
 }
 
-/* Endpoint URL display */
-.endpoint-url {
-  background: var(--ifm-code-background);
-  border: 1px solid var(--ifm-toc-border-color);
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.9rem;
-  display: inline-block;
-  margin: 4px 0;
-}
+/* ── Tables ─────────────────────────────────────────────────── */
+.markdown table { border-collapse: collapse; width: 100%; }
+.markdown table th { background: rgba(34,211,238,0.08); font-weight: 700; }
+.markdown table th, .markdown table td { border: 1px solid var(--oc-border); padding: 8px 14px; }
+.markdown table tr:nth-child(even) { background: rgba(255,255,255,0.02); }
