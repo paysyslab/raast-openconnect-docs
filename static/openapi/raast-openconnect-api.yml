@@ -22,6 +22,8 @@ info:
     url: https://paysyslabs.com
 
 servers:
+  - url: https://raast-openconnect-mock.YOUR_CF_SUBDOMAIN.workers.dev
+    description: Mock Server — update YOUR_CF_SUBDOMAIN after deploying to Cloudflare
   - url: https://openconnect.bank.com
     description: Production (configure per bank)
   - url: https://sandbox.paysyslabs.com/openconnect

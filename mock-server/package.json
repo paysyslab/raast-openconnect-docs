@@ -1,0 +1,12 @@
+{
+  "name": "raast-openconnect-mock",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker mock server for RAAST OpenConnect API",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

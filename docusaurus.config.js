@@ -45,6 +45,7 @@ const config = {
           hideSearch: false,
           hideDarkModeToggle: false,
           hideLogo: false,
+          proxyUrl: 'https://proxy.scalar.com',
           branding: {
             title: 'OpenConnect RAAST API',
             logo: '/img/PaysysLogo.png',

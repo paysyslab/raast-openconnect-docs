@@ -1,0 +1,46 @@
+name: Deploy Mock API to Cloudflare Workers
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'mock-server/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy Mock Server
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy to Cloudflare Workers
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: mock-server
+
+      - name: Update OpenAPI spec server URL
+        run: |
+          WORKER_URL=$(npx wrangler whoami --json 2>/dev/null | node -e "
+            const d=require('fs').readFileSync('/dev/stdin','utf8');
+            try { const j=JSON.parse(d); } catch(e) {}
+          " || true)
+          CF_SUB=$(curl -s -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/workers/subdomain" \
+            | node -e "process.stdin.resume();let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{console.log(JSON.parse(d).result.subdomain)}catch(e){}})")
+          if [ -n "$CF_SUB" ]; then
+            MOCK_URL="https://raast-openconnect-mock.${CF_SUB}.workers.dev"
+            echo "Mock server URL: $MOCK_URL"
+            sed -i "s|https://raast-openconnect-mock\..*\.workers\.dev|${MOCK_URL}|g" static/openapi/raast-openconnect-api.yml
+            sed -i "s|https://raast-openconnect-mock\.YOUR_CF_SUBDOMAIN\.workers\.dev|${MOCK_URL}|g" static/openapi/raast-openconnect-api.yml
+            git config user.name "GitHub Actions"
+            git config user.email "actions@github.com"
+            git add static/openapi/raast-openconnect-api.yml
+            git diff --staged --quiet || git commit -m "ci: update mock server URL to ${MOCK_URL}"
+            git push
+          fi
